@@ -611,7 +611,7 @@ export function buildApartment() {
   }
 
   // ── LUZ AMBIENTE GERAL ──
-  group.add(new THREE.AmbientLight(0x1A0E05, 0.3));
+  group.add(new THREE.AmbientLight(0xffffff, 2.5));
 
   // ── SPAWN ──
   group.userData.spawn         = new THREE.Vector3(SALA_X, 1.65, SALA_Z + SALA_D/2 - 0.8);
