@@ -214,7 +214,7 @@ export function buildLobby() {
 
   // ── ILUMINAÇÃO ──
   // Luz geral fria (fluorescente esverdeada)
-  const ambient = new THREE.AmbientLight(0x2a4a2a, 1.0);
+  const ambient = new THREE.AmbientLight(0x4a6a4a, 1.4);
   group.add(ambient);
 
   // Luzes rebaixadas no teto

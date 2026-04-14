@@ -370,10 +370,11 @@ export function buildCorridor() {
 
     group.add(doorG);
 
-    // Collider da porta fechada
+    // Collider da porta: só a espessura contra a parede (não bloqueia o corredor)
+    const side_sign = side === 'L' ? 1 : -1;
     colliders.push(new THREE.Box3(
-      new THREE.Vector3(xPos - (side==='L'?0.1:DOOR_W), 0, z - DOOR_W/2),
-      new THREE.Vector3(xPos + (side==='L'?DOOR_W:0.1), DOOR_H, z + DOOR_W/2)
+      new THREE.Vector3(xPos - side_sign * 0.06, 0, z - DOOR_W/2),
+      new THREE.Vector3(xPos + side_sign * 0.06, DOOR_H, z + DOOR_W/2)
     ));
 
     doorPivots[num] = { pivot: pivotG, openDir, progress: 0, isOpen: false, onDone: null };
@@ -425,7 +426,7 @@ export function buildCorridor() {
   });
 
   // ── LUZ AMBIENTE ──
-  group.add(new THREE.AmbientLight(0x2a4a2a, 0.8));
+  group.add(new THREE.AmbientLight(0x4a6a4a, 1.2));
 
   // ── EXTINTOR (parede esquerda, perto da porta 1108) ──
   {

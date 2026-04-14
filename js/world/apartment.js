@@ -520,7 +520,7 @@ export function buildApartment() {
   }
 
   // ── LUZ AMBIENTE GERAL ──
-  group.add(new THREE.AmbientLight(0x3a2e20, 0.9));
+  group.add(new THREE.AmbientLight(0x5a4a30, 1.4));
 
   // ── SPAWN ──
   group.userData.spawn         = new THREE.Vector3(SALA_X, 1.65, SALA_Z + SALA_D/2 - 0.8);
