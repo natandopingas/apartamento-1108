@@ -193,9 +193,8 @@ document.addEventListener('keydown', e => {
 });
 
 // Celular — ícone no HUD
-document.getElementById('phone-hud-btn').addEventListener('click', () => {
-  togglePhone();
-});
+const _phoneBtnEl = document.getElementById('phone-hud-btn');
+if (_phoneBtnEl) _phoneBtnEl.addEventListener('click', () => togglePhone());
 
 function handleInteraction(obj) {
   const { type, id, number } = obj.userData;
