@@ -573,8 +573,12 @@ function animate() {
 //  START
 // ─────────────────────────────────────────────
 
-// Começa no corredor → dispara roteiro da Noite 1
-goToWorld('corridor');
+// Mundo inicial — pode ser sobrescrito por ?mundo= na URL
+const _validWorlds = ['corridor', 'lobby', 'elevator', 'apartment'];
+const _urlMundo = new URLSearchParams(window.location.search).get('mundo');
+const _startWorld = _validWorlds.includes(_urlMundo) ? _urlMundo : 'corridor';
+
+goToWorld(_startWorld);
 animate();
 startNight1();
 
