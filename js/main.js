@@ -192,7 +192,10 @@ document.addEventListener('keydown', e => {
   handleInteraction(hoveredObject);
 });
 
-// Celular — ícone no HUD
+// Celular — Tab ou ícone no HUD
+document.addEventListener('keydown', e => {
+  if (e.code === 'Tab') { e.preventDefault(); togglePhone(); }
+}, true); // capture=true garante que intercepta antes do browser
 const _phoneBtnEl = document.getElementById('phone-hud-btn');
 if (_phoneBtnEl) _phoneBtnEl.addEventListener('click', () => togglePhone());
 
@@ -346,15 +349,19 @@ function _openDoor(number, onDone) {
 const phoneOverlay = document.getElementById('phone-overlay');
 const phoneTimeEl  = document.getElementById('phone-time');
 let phoneOpen      = false;
+let _phoneOpening  = false; // impede lock screen de aparecer ao abrir celular
 
 function togglePhone() {
   phoneOpen = !phoneOpen;
   phoneOverlay.classList.toggle('visible', phoneOpen);
   if (phoneOpen) {
+    _phoneOpening = true;
     document.exitPointerLock();
     Phone.open();
   } else {
     Phone.close();
+    // Retoma pointer lock automaticamente ao fechar
+    setTimeout(() => renderer.domElement.requestPointerLock(), 80);
   }
 }
 
@@ -406,7 +413,11 @@ document.addEventListener('pointerlockchange', () => {
     player.setLocked(true);
     Audio.resume();
   } else {
-    // Perdeu o pointer lock (ESC) — mostra lock screen pra retomar
+    if (_phoneOpening) {
+      // Celular abrindo — não mostra lock screen
+      _phoneOpening = false;
+      return;
+    }
     if (player.locked) {
       player.setLocked(false);
       lockScreen.classList.remove('hidden');

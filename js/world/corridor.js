@@ -288,15 +288,48 @@ export function buildCorridor() {
     new THREE.Vector3(W/2 + 0.15, H, HL)
   ));
 
-  // Parede do fundo (elevador)
-  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(W, H), wallMat);
-  backWall.position.set(0, H/2, HL);
-  backWall.rotation.y = Math.PI;
-  group.add(backWall);
+  // Parede do fundo (elevador) — dividida em 3 partes para abrir espaço das portas
+  [[-W/2, 0], [W/2 - 0.3, W/2]].forEach(([x1, x2]) => {
+    const seg = new THREE.Mesh(
+      new THREE.PlaneGeometry(Math.abs(x2 - x1), H), wallMat
+    );
+    seg.position.set((x1 + x2) / 2, H/2, HL);
+    seg.rotation.y = Math.PI;
+    group.add(seg);
+  });
   colliders.push(new THREE.Box3(
     new THREE.Vector3(-W/2, 0, HL - 0.05),
     new THREE.Vector3( W/2, H, HL + 0.15)
   ));
+
+  // ── PORTAS DO ELEVADOR (parede do fundo) ──
+  const elevCorrMat = new THREE.MeshLambertMaterial({ color: 0x3a3e44 });
+  [-0.55, 0.55].forEach((xOff, i) => {
+    const door = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 2.1), elevCorrMat);
+    door.position.set(xOff, 1.05, HL - 0.04);
+    door.rotation.y = Math.PI;
+    door.userData = { type: 'elevator_call', id: `elev_corr_${i}`, label: '[E] Chamar Elevador' };
+    group.add(door);
+    interactables.push(door);
+
+    // Display LED
+    const dc = document.createElement('canvas');
+    dc.width = 128; dc.height = 64;
+    const dx = dc.getContext('2d');
+    dx.fillStyle = '#0a0600'; dx.fillRect(0,0,128,64);
+    dx.fillStyle = '#FF8800';
+    dx.font = 'bold 28px monospace'; dx.textAlign = 'center';
+    dx.fillText('11', 64, 42);
+    dx.font = '9px monospace'; dx.fillText('ANDAR', 64, 58);
+    const dispTex = new THREE.CanvasTexture(dc);
+    const disp = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.24, 0.12),
+      new THREE.MeshBasicMaterial({ map: dispTex })
+    );
+    disp.position.set(xOff, 2.3, HL - 0.03);
+    disp.rotation.y = Math.PI;
+    group.add(disp);
+  });
 
   // Parede da frente (fim do corredor)
   const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(W, H), wallMat);
