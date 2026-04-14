@@ -525,13 +525,20 @@ function animate() {
     }
   }
 
-  // Apartment: TV static color animation
-  if (activeWorldName === 'apartment' && activeWorld.userData.tvMat) {
-    const tv = activeWorld.userData.tvMat;
-    const r  = Math.floor(20 + Math.random() * 15);
-    const g  = Math.floor(60 + Math.random() * 20);
-    const b  = Math.floor(140 + Math.random() * 30);
-    tv.color.setRGB(r/255, g/255, b/255);
+  // Apartment: TV static canvas animation (a cada 4 frames)
+  if (activeWorldName === 'apartment' && activeWorld.userData.tvStaticCtx) {
+    if (Math.floor(time * 60) % 4 === 0) {
+      const ctx = activeWorld.userData.tvStaticCtx;
+      const W = 64, H = 48;
+      const img = ctx.createImageData(W, H);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const v = Math.random() * 255 | 0;
+        img.data[i] = img.data[i+1] = img.data[i+2] = v;
+        img.data[i+3] = 255;
+      }
+      ctx.putImageData(img, 0, 0);
+      activeWorld.userData.tvStaticTex.needsUpdate = true;
+    }
   }
 
   // Intercom blink quando chamando

@@ -173,19 +173,24 @@ export function buildApartment() {
     tvBody.castShadow = true;
     group.add(tvBody);
 
-    // Tela (emissiva azulada — estática)
-    const screenMat = new THREE.MeshBasicMaterial({ color: 0x3355aa });
+    // Tela — estática animada via canvas
+    const tvCanvas = document.createElement('canvas');
+    tvCanvas.width = 64; tvCanvas.height = 48;
+    const tvCtx = tvCanvas.getContext('2d');
+    const tvTex = new THREE.CanvasTexture(tvCanvas);
+    const screenMat = new THREE.MeshBasicMaterial({ map: tvTex });
     const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.60, 0.46), screenMat);
     screen.position.set(SALA_X, 0.85, SALA_Z - SALA_D/2 + 0.66);
     screen.userData = { type: 'tv', id: 'tv', label: '[E] TV' };
     group.add(screen);
     interactables.push(screen);
-    group.userData.tvScreen = screen;
-    group.userData.tvMat    = screenMat;
+    group.userData.tvScreen    = screen;
+    group.userData.tvStaticCtx = tvCtx;
+    group.userData.tvStaticTex = tvTex;
 
-    // Luz da TV (azul, distância curta)
-    const tvLight = new THREE.PointLight(0x3355cc, 0.7, 3.5, 2.0);
-    tvLight.position.set(SALA_X, 0.9, SALA_Z - SALA_D/2 + 0.8);
+    // Luz da TV — branca-fria
+    const tvLight = new THREE.PointLight(0xE8E8FF, 1.2, 5, 2.0);
+    tvLight.position.set(SALA_X, 0.9, SALA_Z - SALA_D/2 + 1.0);
     group.add(tvLight);
     group.userData.tvLight = tvLight;
   }
@@ -309,11 +314,9 @@ export function buildApartment() {
 
   // ── ILUMINAÇÃO DA SALA ──
   {
-    // Teto (fraco — a TV é a principal fonte de noite)
-    const ceilL = new THREE.PointLight(0xFFE0B0, 1.4, 10, 1.2);
+    // Teto — fraco, TV domina
+    const ceilL = new THREE.PointLight(0xFFE0B0, 0.15, 6, 2.0);
     ceilL.position.set(SALA_X, SALA_H - 0.1, SALA_Z);
-    ceilL.castShadow = true;
-    ceilL.shadow.mapSize.set(512, 512);
     group.add(ceilL);
     group.userData.salaLight = ceilL;
     // Luminária (esfera)
@@ -552,7 +555,7 @@ export function buildApartment() {
   }
 
   // ── LUZ AMBIENTE GERAL ──
-  group.add(new THREE.AmbientLight(0x5a4a30, 1.4));
+  group.add(new THREE.AmbientLight(0x1A0E05, 0.3));
 
   // ── SPAWN ──
   group.userData.spawn         = new THREE.Vector3(SALA_X, 1.65, SALA_Z + SALA_D/2 - 0.8);
