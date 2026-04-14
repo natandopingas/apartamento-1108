@@ -370,25 +370,54 @@ document.getElementById('phone-home-btn').addEventListener('click', () => {
 const lockScreen  = document.getElementById('lock-screen');
 const titleScreen = document.getElementById('title-screen');
 
-// Título → esconde e mostra lock screen
+function _startGame() {
+  lockScreen.classList.add('hidden');
+  player.setLocked(true);
+  Audio.resume();
+}
+
+// Um único clique: título → tenta pointer lock → começa de qualquer jeito
 titleScreen.addEventListener('click', () => {
   titleScreen.classList.add('hidden');
-  // Após a transição, remove do flow e mostra lock screen
-  setTimeout(() => {
-    titleScreen.style.display = 'none';
-    lockScreen.classList.remove('hidden');
-  }, 1300);
-});
+  setTimeout(() => { titleScreen.style.display = 'none'; }, 1300);
 
-lockScreen.addEventListener('click', () => {
-  if (!phoneOpen) renderer.domElement.requestPointerLock();
+  // Tenta pointer lock; se falhar em 600ms, começa sem ele
+  let started = false;
+  function tryStart() {
+    if (started) return;
+    started = true;
+    _startGame();
+  }
+
+  try {
+    const req = renderer.domElement.requestPointerLock();
+    if (req && typeof req.then === 'function') {
+      req.then(tryStart).catch(tryStart);
+    }
+  } catch(e) {}
+
+  // Fallback: se pointer lock não disparar em 600ms, começa mesmo assim
+  setTimeout(tryStart, 600);
 });
 
 document.addEventListener('pointerlockchange', () => {
   const locked = document.pointerLockElement === renderer.domElement;
-  lockScreen.classList.toggle('hidden', locked);
-  player.setLocked(locked);
-  if (locked) Audio.resume();
+  if (locked) {
+    lockScreen.classList.add('hidden');
+    player.setLocked(true);
+    Audio.resume();
+  } else {
+    // Perdeu o pointer lock (ESC) — mostra lock screen pra retomar
+    if (player.locked) {
+      player.setLocked(false);
+      lockScreen.classList.remove('hidden');
+    }
+  }
+});
+
+// Clique no lock screen retoma o jogo
+lockScreen.addEventListener('click', () => {
+  if (!phoneOpen) renderer.domElement.requestPointerLock();
 });
 
 // ─────────────────────────────────────────────
