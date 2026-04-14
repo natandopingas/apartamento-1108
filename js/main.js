@@ -561,9 +561,8 @@ function animate() {
     activeWorld.userData.curtR.rotation.z = -sway;
   }
 
-  // VHS shader (desativado temporariamente para teste visual)
-  vhsPass.uniforms.time.value    = 0;
-  vhsPass.uniforms.tension.value = 0;
+  // VHS shader (desativado para teste visual)
+  vhsPass.enabled = false;
 
   // Clock display
   updateClockDisplay();
