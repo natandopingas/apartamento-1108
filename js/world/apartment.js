@@ -195,30 +195,54 @@ export function buildApartment() {
     group.userData.tvLight = tvLight;
   }
 
-  // ── SOFÁ AZUL ESCURO ──
+  // ── SOFÁ AZUL MARINHO ──
   {
-    const sofaM = new THREE.MeshLambertMaterial({ color: 0x1a2840 });
-    const armM  = new THREE.MeshLambertMaterial({ color: 0x0e1828 });
-    const seat  = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.22, 0.8), sofaM);
-    seat.position.set(SALA_X + 1.4, 0.44, SALA_Z);
-    group.add(seat);
-    const back  = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.52, 0.18), sofaM);
-    back.position.set(SALA_X + 1.4, 0.74, SALA_Z - 0.32);
-    group.add(back);
-    const armL  = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.50, 0.8), armM);
-    armL.position.set(SALA_X + 0.5, 0.58, SALA_Z);
-    group.add(armL);
-    const armR  = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.50, 0.8), armM);
-    armR.position.set(SALA_X + 2.3, 0.58, SALA_Z);
-    group.add(armR);
-    // Almofada
-    const pillow = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.14, 0.36), new THREE.MeshLambertMaterial({ color: 0xd0d4d8 }));
-    pillow.position.set(SALA_X + 0.8, 0.59, SALA_Z - 0.15);
-    group.add(pillow);
-    // Collider sofá
+    const sofaM = new THREE.MeshLambertMaterial({ color: 0x1C2340 });
+
+    // Posição base do sofá (mesmo lugar do anterior)
+    const SX = SALA_X + 1.4, SZ = SALA_Z;
+
+    const sofaG = new THREE.Group();
+    sofaG.position.set(SX, 0, SZ);
+
+    // Assento: 2.1 x 0.45 x 0.9, base a 0.35m do chão
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.45, 0.9), sofaM);
+    seat.position.set(0, 0.35 + 0.225, 0);
+    sofaG.add(seat);
+
+    // Encosto: 2.1 x 0.6 x 0.15, atrás do assento, levemente inclinado
+    const back = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.6, 0.15), sofaM);
+    back.position.set(0, 0.35 + 0.45 + 0.3, -0.375);
+    back.rotation.x = -0.1;
+    sofaG.add(back);
+
+    // Braço esquerdo: 0.15 x 0.55 x 0.9
+    const armL = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.55, 0.9), sofaM);
+    armL.position.set(-1.125, 0.35 + 0.275, 0);
+    sofaG.add(armL);
+
+    // Braço direito
+    const armR = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.55, 0.9), sofaM);
+    armR.position.set(1.125, 0.35 + 0.275, 0);
+    sofaG.add(armR);
+
+    // Almofadas (esferas achatadas)
+    [-0.5, 0.5].forEach(ox => {
+      const pillow = new THREE.Mesh(
+        new THREE.SphereGeometry(0.22, 10, 8),
+        new THREE.MeshLambertMaterial({ color: 0x2A3560 })
+      );
+      pillow.scale.set(1, 0.4, 0.85);
+      pillow.position.set(ox, 0.35 + 0.45 + 0.09, -0.05);
+      sofaG.add(pillow);
+    });
+
+    group.add(sofaG);
+
+    // Collider (mantém footprint do sofá anterior)
     colliders.push(new THREE.Box3(
-      new THREE.Vector3(SALA_X+0.4, 0, SALA_Z-0.45),
-      new THREE.Vector3(SALA_X+2.45, 0.78, SALA_Z+0.45)
+      new THREE.Vector3(SX - 1.2, 0, SZ - 0.5),
+      new THREE.Vector3(SX + 1.2, 1.0, SZ + 0.5)
     ));
   }
 
