@@ -192,12 +192,9 @@ document.addEventListener('keydown', e => {
   handleInteraction(hoveredObject);
 });
 
-// Celular (Tab ou C)
-document.addEventListener('keydown', e => {
-  if (e.code === 'Tab' || e.code === 'KeyC') {
-    e.preventDefault();
-    togglePhone();
-  }
+// Celular — ícone no HUD
+document.getElementById('phone-hud-btn').addEventListener('click', () => {
+  togglePhone();
 });
 
 function handleInteraction(obj) {

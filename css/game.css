@@ -69,6 +69,22 @@ html, body {
   letter-spacing: 2px;
 }
 
+#phone-hud-btn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  font-size: 28px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s, transform 0.15s;
+  user-select: none;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+}
+#phone-hud-btn:hover {
+  opacity: 1;
+  transform: scale(1.12);
+}
+
 /* ── THOUGHT BUBBLE ── */
 #thought-bubble {
   position: absolute;
