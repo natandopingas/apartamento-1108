@@ -276,23 +276,55 @@ export function buildApartment() {
     group.add(g2n);
   }
 
-  // ── CORTINA VERDE (varanda/sacada) ──
+  // ── SACADA: VIDRO + CORTINA + VARÃO + LUZES DA CIDADE ──
   {
-    const curtM = new THREE.MeshLambertMaterial({ color: 0x2a4a28, side: THREE.DoubleSide });
-    const curtL = new THREE.Mesh(new THREE.PlaneGeometry(0.7, SALA_H - 0.1), curtM);
-    curtL.position.set(SALA_X - 0.45, SALA_H/2 + 0.05, SALA_Z - SALA_D/2 + 0.02);
-    group.add(curtL);
-    const curtR = new THREE.Mesh(new THREE.PlaneGeometry(0.7, SALA_H - 0.1), curtM);
-    curtR.position.set(SALA_X + 0.45, SALA_H/2 + 0.05, SALA_Z - SALA_D/2 + 0.02);
-    group.add(curtR);
-    group.userData.curtL = curtL;
-    group.userData.curtR = curtR;
+    const wallZ = SALA_Z - SALA_D/2;
 
-    // Vidro da varanda (escurecido)
-    const glassMat = new THREE.MeshBasicMaterial({ color: 0x040810, transparent: true, opacity: 0.7 });
-    const glass = new THREE.Mesh(new THREE.PlaneGeometry(0.9, SALA_H), glassMat);
-    glass.position.set(SALA_X, SALA_H/2, SALA_Z - SALA_D/2 + 0.01);
+    // Porta de vidro (MeshPhysicalMaterial, noite escura)
+    const glassMat = new THREE.MeshPhysicalMaterial({
+      color: 0x0A0F1A,
+      transparent: true,
+      opacity: 0.15,
+      roughness: 0.05,
+      metalness: 0.1,
+      side: THREE.DoubleSide,
+    });
+    const glass = new THREE.Mesh(new THREE.PlaneGeometry(1.8, SALA_H), glassMat);
+    glass.position.set(SALA_X, SALA_H/2, wallZ + 0.01);
     group.add(glass);
+
+    // Luzes da cidade (atrás do vidro, muito fracas, azuladas)
+    [
+      { x: SALA_X - 0.6, c: 0x1a3a6a, i: 0.07 },
+      { x: SALA_X + 0.5, c: 0x0a2050, i: 0.05 },
+      { x: SALA_X,       c: 0x2a4a8a, i: 0.06 },
+    ].forEach(({ x, c, i }) => {
+      const pl = new THREE.PointLight(c, i, 4, 2);
+      pl.position.set(x, SALA_H * 0.5, wallZ - 1.5);
+      group.add(pl);
+    });
+
+    // Varão da cortina
+    const rodMat = new THREE.MeshLambertMaterial({ color: 0x8B7355 });
+    const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 2.0, 8), rodMat);
+    rod.rotation.z = Math.PI / 2;
+    rod.position.set(SALA_X, SALA_H - 0.12, wallZ + 0.06);
+    group.add(rod);
+
+    // Cortina com deslocamento de vértices (dobras de tecido)
+    const curtGeo = new THREE.PlaneGeometry(1.8, 2.2, 8, 20);
+    const pos = curtGeo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      pos.setZ(i, pos.getZ(i) + Math.sin(x * 3.8) * 0.055);
+    }
+    pos.needsUpdate = true;
+    curtGeo.computeVertexNormals();
+
+    const curtMat = new THREE.MeshLambertMaterial({ color: 0x2D4A2D, side: THREE.DoubleSide });
+    const curt = new THREE.Mesh(curtGeo, curtMat);
+    curt.position.set(SALA_X, SALA_H/2 - 0.1, wallZ + 0.07);
+    group.add(curt);
   }
 
   // ── PRATELEIRAS (parede esquerda) ──
