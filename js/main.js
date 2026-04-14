@@ -107,10 +107,10 @@ function goToWorld(name) {
 
   // Fog por cena
     const fogs = {
-      corridor:  { color: 0x08100a, density: 0.04 },
-      lobby:     { color: 0x0a140c, density: 0.03 },
-      elevator:  { color: 0x0c1014, density: 0.05 },
-      apartment: { color: 0x100c08, density: 0.035 },
+      corridor:  { color: 0x08100a, density: 0.02 },
+      lobby:     { color: 0x0a140c, density: 0.015 },
+      elevator:  { color: 0x0c1014, density: 0.025 },
+      apartment: { color: 0x100c08, density: 0.018 },
     };
     const fog = fogs[name] || fogs.corridor;
     scene.fog = new THREE.FogExp2(fog.color, fog.density);

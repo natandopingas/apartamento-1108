@@ -278,7 +278,7 @@ export function buildApartment() {
   // ── ILUMINAÇÃO DA SALA ──
   {
     // Teto (fraco — a TV é a principal fonte de noite)
-    const ceilL = new THREE.PointLight(0xFFE0B0, 0.6, 6, 1.5);
+    const ceilL = new THREE.PointLight(0xFFE0B0, 1.4, 10, 1.2);
     ceilL.position.set(SALA_X, SALA_H - 0.1, SALA_Z);
     ceilL.castShadow = true;
     ceilL.shadow.mapSize.set(512, 512);
@@ -520,7 +520,7 @@ export function buildApartment() {
   }
 
   // ── LUZ AMBIENTE GERAL ──
-  group.add(new THREE.AmbientLight(0x2a1e10, 0.5));
+  group.add(new THREE.AmbientLight(0x3a2e20, 0.9));
 
   // ── SPAWN ──
   group.userData.spawn         = new THREE.Vector3(SALA_X, 1.65, SALA_Z + SALA_D/2 - 0.8);

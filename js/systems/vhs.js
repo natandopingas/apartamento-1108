@@ -68,7 +68,7 @@ export const VHSShader = {
       col.rgb *= scan;
 
       // ── FILM GRAIN ──
-      float grainAmt = 0.045 + tension * 0.025;
+      float grainAmt = 0.025 + tension * 0.02;
       float grain = noise(uv * 800.0 + vec2(time * 47.3, time * 31.7)) * 2.0 - 1.0;
       col.rgb += grain * grainAmt;
 
@@ -78,7 +78,7 @@ export const VHSShader = {
       col.rgb *= vig;
 
       // ── DESATURATE ──
-      float desat = 0.15 + tension * 0.08;
+      float desat = 0.08 + tension * 0.06;
       float lum = dot(col.rgb, vec3(0.299, 0.587, 0.114));
       col.rgb = mix(col.rgb, vec3(lum), desat);
 

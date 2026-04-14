@@ -214,13 +214,13 @@ export function buildLobby() {
 
   // ── ILUMINAÇÃO ──
   // Luz geral fria (fluorescente esverdeada)
-  const ambient = new THREE.AmbientLight(0x1a2e1a, 0.6);
+  const ambient = new THREE.AmbientLight(0x2a4a2a, 1.0);
   group.add(ambient);
 
   // Luzes rebaixadas no teto
   const ceilLightPos = [[-2,H-0.1,-1],[2,H-0.1,-1],[-2,H-0.1,2],[2,H-0.1,2],[0,H-0.1,0]];
   ceilLightPos.forEach(([x,y,z]) => {
-    const pl = new THREE.PointLight(0xCCDDCC, 1.4, 7, 1.2);
+    const pl = new THREE.PointLight(0xCCDDCC, 2.5, 10, 1.0);
     pl.position.set(x, y, z);
     group.add(pl);
     const bulb = new THREE.Mesh(new THREE.CircleGeometry(0.15,8), new THREE.MeshBasicMaterial({color:0x8aaa8a, side:THREE.DoubleSide}));

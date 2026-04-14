@@ -411,7 +411,7 @@ export function buildCorridor() {
     group.add(bulb);
 
     // PointLight
-    const pl = new THREE.PointLight(0xFFE4A0, 2.2, 10, 1.5);
+    const pl = new THREE.PointLight(0xFFE4A0, 3.5, 14, 1.2);
     pl.position.set(0, H - 0.28, z);
     pl.castShadow = (i === 0);
     if (pl.castShadow) {
@@ -425,7 +425,7 @@ export function buildCorridor() {
   });
 
   // ── LUZ AMBIENTE ──
-  group.add(new THREE.AmbientLight(0x1a2e1a, 0.45));
+  group.add(new THREE.AmbientLight(0x2a4a2a, 0.8));
 
   // ── EXTINTOR (parede esquerda, perto da porta 1108) ──
   {
