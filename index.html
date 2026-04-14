@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apartamento 1108</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/game.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <div id="renderer-container"></div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div id="crosshair"></div>
+    <div id="interaction-prompt"></div>
+    <div id="clock">16:10</div>
+    <div id="thought-bubble">
+      <span id="thought-text"></span>
+    </div>
+  </div>
+
+  <!-- Dialogue box -->
+  <div id="dialogue-box">
+    <div id="dialogue-speaker"></div>
+    <div id="dialogue-text"></div>
+    <div id="dialogue-choices"></div>
+  </div>
+
+  <!-- Phone overlay -->
+  <div id="phone-overlay">
+    <div id="phone-frame">
+      <div id="phone-statusbar">
+        <span id="phone-time">16:10</span>
+        <span id="phone-signal">▐▐▐</span>
+        <span id="phone-battery">▓▓▓▓░ 72%</span>
+      </div>
+      <div id="phone-screen"></div>
+      <div id="phone-home-btn">⬛</div>
+    </div>
+  </div>
+
+  <!-- Tela de título -->
+  <div id="title-screen">
+    <div id="title-content">
+      <div id="title-eyebrow">UM JOGO DE HORROR PSICOLÓGICO</div>
+      <h1 id="title-name">APARTAMENTO<br>1108</h1>
+      <div id="title-tagline">"não confie no porteiro da noite"</div>
+      <div id="title-prompt">[ clique para começar ]</div>
+    </div>
+    <div id="title-vignette"></div>
+  </div>
+
+  <!-- Lock / start screen (após título) -->
+  <div id="lock-screen" class="hidden">
+    <div id="lock-content">
+      <h1>APARTAMENTO 1108</h1>
+      <p>Clique para jogar</p>
+      <p class="lock-hint">WASD — Mover &nbsp;·&nbsp; Mouse — Olhar &nbsp;·&nbsp; E — Interagir &nbsp;·&nbsp; Shift — Andar devagar &nbsp;·&nbsp; ESC — Pausar</p>
+    </div>
+  </div>
+
+  <!-- Fade overlay -->
+  <div id="fade-overlay"></div>
+
+  <script>
+    // Mostra qualquer erro JS visível na tela
+    window.addEventListener('error', function(e) {
+      var d = document.getElementById('err-overlay');
+      if (!d) {
+        d = document.createElement('div');
+        d.id = 'err-overlay';
+        d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#000;color:#f55;font-family:monospace;font-size:13px;padding:24px;z-index:9999;white-space:pre-wrap;overflow:auto';
+        document.body.appendChild(d);
+      }
+      d.textContent += 'ERRO: ' + e.message + '\n  em ' + e.filename + ':' + e.lineno + '\n\n';
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      var d = document.getElementById('err-overlay');
+      if (!d) {
+        d = document.createElement('div');
+        d.id = 'err-overlay';
+        d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#000;color:#f55;font-family:monospace;font-size:13px;padding:24px;z-index:9999;white-space:pre-wrap;overflow:auto';
+        document.body.appendChild(d);
+      }
+      d.textContent += 'ERRO (promise): ' + e.reason + '\n\n';
+    });
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

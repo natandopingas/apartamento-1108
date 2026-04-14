@@ -1,0 +1,325 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: 'Press Start 2P', monospace;
+  color: #fff;
+  user-select: none;
+}
+
+/* ── RENDERER ── */
+#renderer-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+}
+#renderer-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  image-rendering: pixelated;
+}
+
+/* ── HUD ── */
+#hud {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#crosshair {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px; height: 4px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 50%;
+  transition: transform 0.12s, background 0.12s;
+}
+#crosshair.active {
+  background: rgba(255,255,255,0.85);
+  transform: translate(-50%, -50%) scale(1.8);
+  box-shadow: 0 0 8px rgba(255,255,255,0.4);
+}
+
+#interaction-prompt {
+  position: absolute;
+  bottom: 28%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 7px;
+  color: rgba(255,255,255,0.72);
+  letter-spacing: 1.5px;
+  opacity: 0;
+  transition: opacity 0.18s;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+  white-space: nowrap;
+}
+#interaction-prompt.visible { opacity: 1; }
+
+#clock {
+  position: absolute;
+  top: 14px; right: 18px;
+  font-size: 8px;
+  color: rgba(255,255,255,0.38);
+  letter-spacing: 2px;
+}
+
+/* ── THOUGHT BUBBLE ── */
+#thought-bubble {
+  position: absolute;
+  top: 33%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 17px;
+  color: #CCE0FF;
+  text-align: center;
+  max-width: 58%;
+  line-height: 1.55;
+  text-shadow: 0 0 24px rgba(0,80,200,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+#thought-bubble.visible { opacity: 1; }
+
+/* ── DIALOGUE BOX ── */
+#dialogue-box {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  padding: 18px 36px 22px;
+  background: rgba(0,0,0,0.84);
+  border-top: 1px solid rgba(255,255,255,0.07);
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 0.22s, transform 0.22s;
+}
+#dialogue-box.visible {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+
+#dialogue-speaker {
+  font-size: 8px;
+  color: #FFD07A;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+#dialogue-text {
+  font-family: Georgia, serif;
+  font-size: 15px;
+  color: #EEEEEE;
+  line-height: 1.65;
+  min-height: 50px;
+}
+
+#dialogue-choices {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.choice-btn {
+  background: none;
+  border: none;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #999;
+  text-align: left;
+  cursor: pointer;
+  padding: 4px 0;
+  letter-spacing: 0.5px;
+  transition: color 0.12s;
+}
+.choice-btn::before { content: '›  '; color: #FFD07A; }
+.choice-btn:hover { color: #FFF; }
+
+/* ── PHONE ── */
+#phone-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s;
+}
+#phone-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#phone-frame {
+  width: 310px; height: 560px;
+  background: #090910;
+  border-radius: 26px;
+  border: 2px solid #1e1e28;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 60px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+#phone-statusbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 14px 5px;
+  font-size: 7px;
+  color: rgba(255,255,255,0.55);
+  background: #050508;
+  flex-shrink: 0;
+}
+
+#phone-screen {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+#phone-home-btn {
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  color: #2a2a38;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+#phone-home-btn:hover { color: #555; }
+
+/* ── LOCK SCREEN ── */
+#lock-screen {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  cursor: pointer;
+  transition: opacity 0.5s;
+}
+#lock-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#lock-content { text-align: center; }
+
+#lock-content h1 {
+  font-size: 16px;
+  color: #DDD;
+  margin-bottom: 28px;
+  letter-spacing: 4px;
+  text-shadow: 0 0 40px rgba(255,255,255,0.12);
+}
+
+#lock-content p {
+  font-size: 8px;
+  color: rgba(255,255,255,0.42);
+  margin-bottom: 10px;
+}
+
+.lock-hint {
+  font-size: 6px !important;
+  color: rgba(255,255,255,0.22) !important;
+  margin-top: 22px !important;
+  line-height: 2;
+}
+
+/* ── FADE ── */
+#fade-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 45;
+  transition: opacity 0.55s;
+}
+#fade-overlay.fading { opacity: 1; }
+
+/* ── TITLE SCREEN ── */
+#title-screen {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  cursor: pointer;
+  transition: opacity 1.2s;
+}
+#title-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#title-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.85) 100%);
+  pointer-events: none;
+}
+
+#title-content {
+  text-align: center;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+#title-eyebrow {
+  font-size: 6px;
+  color: rgba(100,130,100,0.5);
+  letter-spacing: 5px;
+  margin-bottom: 32px;
+}
+
+#title-name {
+  font-size: 28px;
+  color: #c8c8b8;
+  letter-spacing: 6px;
+  line-height: 1.3;
+  text-shadow: 0 0 60px rgba(255,255,255,0.06);
+  margin: 0 0 28px;
+  font-weight: normal;
+}
+
+#title-tagline {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: rgba(150,170,150,0.45);
+  letter-spacing: 1px;
+  margin-bottom: 52px;
+}
+
+#title-prompt {
+  font-size: 7px;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 3px;
+  animation: title-blink 2s ease-in-out infinite;
+}
+
+@keyframes title-blink {
+  0%, 100% { opacity: 0.2; }
+  50%       { opacity: 0.6; }
+}

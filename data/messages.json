@@ -1,0 +1,64 @@
+{
+  "conversations": {
+    "mae": {
+      "name": "Mãe",
+      "avatar": "👩",
+      "color": "#ff88aa",
+      "messages": [
+        { "time": "18:30", "from": "them", "text": "Filho(a), chegou bem? Tô preocupada. Manda foto do apartamento!" },
+        { "time": "20:00", "from": "them", "text": "Já comeu? Não vai dormir sem comer." }
+      ],
+      "replies": {
+        "18:30": [
+          { "text": "Cheguei sim, mãe. Tá tudo bem! Depois mando foto.", "response": "Graças a Deus! Come alguma coisa direito, tá? Primeiro dia na casa nova, tem que comer bem." },
+          { "text": "Cheguei. O prédio é meio estranho.", "response": "Estranho como?? Você tá bem???", "subChoices": true },
+          { "text": "[Câmera] Mandar foto do apê", "action": "sendPhoto", "response": "Que lindo! Tá meio vazio ainda né, mas vai ficar bonito! Capricha na arrumação!" }
+        ],
+        "20:00": [
+          { "text": "Vou pedir comida agora.", "response": "Pede algo bom, tá? Primeiro jantar na casa nova!" },
+          { "text": "Já já como, mãe.", "response": "Tô de olho, hein 👀" }
+        ]
+      }
+    },
+    "lucas": {
+      "name": "Lucas",
+      "avatar": "🧑",
+      "color": "#88ccff",
+      "messages": [
+        { "time": "19:00", "from": "them", "text": "E aí, sobreviveu à mudança? O prédio é mal assombrado? kkkk" }
+      ],
+      "replies": {
+        "19:00": [
+          { "text": "Quase morri carregando caixa, mas tô vivo.", "response": "Dramático demais kkkk. Manda foto do apê aí" },
+          { "text": "Cara, os porteiros daqui são esquisitos.", "response": "Porteiro esquisito é padrão de prédio antigo, relaxa. O do meu prédio antigo era pior" },
+          { "text": "Tranquilo, apê é daora.", "response": "Show. Bora fazer churrasco lá quando tu arrumar tudo" }
+        ]
+      }
+    },
+    "galera": {
+      "name": "Galera 🏠",
+      "avatar": "👥",
+      "color": "#ffaa44",
+      "messages": [
+        { "time": "19:30", "from": "carol", "text": "Carol: Sai do apê e vem comemorar a casa nova!! A gente tá te esperando 🍺" }
+      ],
+      "replies": {
+        "19:30": [
+          { "text": "Aaah queria mas tô destruído da mudança, não rola hoje.", "response": "Carol: Ahhh :( tá perdoado, mas semana que vem não escapa!\nLucas: fraco kkkk" },
+          { "text": "Gente, acabei de me mudar, nem desfiz as caixas todas.", "response": "Carol: Tá bom, tá bom, descansa então. Manda foto do apê!" },
+          { "text": "Tô sem grana, gastei tudo na mudança kk.", "response": "Carol: A gente paga pra você!! Vem!!" }
+        ]
+      }
+    },
+    "desconhecido": {
+      "name": "Número desconhecido",
+      "avatar": "❓",
+      "color": "#ff3333",
+      "messages": [
+        { "time": "22:30", "from": "them", "text": "Bem-vindo ao 1108 :)" }
+      ],
+      "replies": null,
+      "locked": true
+    }
+  }
+}

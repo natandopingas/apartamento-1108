@@ -1,0 +1,8 @@
+# Servidor local
+server.ps1
+RODAR.bat
+
+# Sistema
+Thumbs.db
+.DS_Store
+desktop.ini
