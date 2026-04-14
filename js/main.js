@@ -561,9 +561,9 @@ function animate() {
     activeWorld.userData.curtR.rotation.z = -sway;
   }
 
-  // VHS shader
-  vhsPass.uniforms.time.value    = time;
-  vhsPass.uniforms.tension.value = State.getFlag('tension') ? 1.0 : 0.0;
+  // VHS shader (desativado temporariamente para teste visual)
+  vhsPass.uniforms.time.value    = 0;
+  vhsPass.uniforms.tension.value = 0;
 
   // Clock display
   updateClockDisplay();
