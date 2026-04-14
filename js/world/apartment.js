@@ -56,6 +56,37 @@ function makeWallTex(hex) {
   return t;
 }
 
+function makeSalaFloorTex() {
+  const C = document.createElement('canvas');
+  C.width = 512; C.height = 256;
+  const cx = C.getContext('2d');
+  const PLANK_H = 32; // altura de cada tábua em px (~0.3m)
+  const numPlanks = C.height / PLANK_H; // 8 tábuas
+  const baseColors = ['#3D2B1F','#3A2820','#412E22','#382719','#3E2C20'];
+  for (let p = 0; p < numPlanks; p++) {
+    const col = baseColors[p % baseColors.length];
+    cx.fillStyle = col;
+    cx.fillRect(0, p * PLANK_H, C.width, PLANK_H - 1);
+    // Veios sutis ao longo de cada tábua
+    cx.strokeStyle = 'rgba(20,10,5,0.18)';
+    cx.lineWidth = 1;
+    for (let v = 0; v < 6; v++) {
+      const yv = p * PLANK_H + 4 + v * 4;
+      cx.beginPath();
+      cx.moveTo(0, yv + Math.sin(v) * 1.5);
+      cx.lineTo(C.width, yv + Math.sin(v + 2) * 1.5);
+      cx.stroke();
+    }
+    // Rejunte entre tábuas
+    cx.fillStyle = '#2A1D14';
+    cx.fillRect(0, p * PLANK_H + PLANK_H - 1, C.width, 1);
+  }
+  const t = new THREE.CanvasTexture(C);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(3, 3);
+  return t;
+}
+
 function makeTileTex() {
   const C = document.createElement('canvas');
   C.width = C.height = 256;
@@ -117,12 +148,13 @@ export function buildApartment() {
   const colliders = [];
   const interactables = [];
 
-  const woodFloor = makeWoodFloorTex();
-  const tileTex   = makeTileTex();
+  const woodFloor   = makeWoodFloorTex();
+  const salaFloor   = makeSalaFloorTex();
+  const tileTex     = makeTileTex();
 
   // ── SALA (5m × 4m) ──
   const SALA_X = 0, SALA_Z = 0, SALA_W = 5.0, SALA_D = 4.0, SALA_H = 2.6;
-  makeRoom(group, colliders, SALA_X, SALA_Z, SALA_W, SALA_D, SALA_H, '#7a6040', woodFloor);
+  makeRoom(group, colliders, SALA_X, SALA_Z, SALA_W, SALA_D, SALA_H, '#C4874A', salaFloor, '#1A1410');
 
   // ── TV CRT (parede do fundo, centro) ──
   {
