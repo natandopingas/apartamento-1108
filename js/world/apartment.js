@@ -84,6 +84,8 @@ function makeSalaFloorTex() {
   const t = new THREE.CanvasTexture(C);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   t.repeat.set(3, 3);
+  t.rotation = Math.PI / 2;   // tábuas apontam para a cortina (eixo Z)
+  t.center.set(0.5, 0.5);
   return t;
 }
 
@@ -156,27 +158,25 @@ export function buildApartment() {
   const SALA_X = 0, SALA_Z = 0, SALA_W = 5.0, SALA_D = 4.0, SALA_H = 2.6;
   makeRoom(group, colliders, SALA_X, SALA_Z, SALA_W, SALA_D, SALA_H, '#C4874A', salaFloor, '#1A1410');
 
-  // ── TV CRT (parede BC — esquerda, perto do fundo) ──
+  // ── TV PLANA (parede BC — esquerda, perto do fundo) ──
   {
     const TV_X = SALA_X - SALA_W/2;  // x = -2.5 (parede BC)
-    const TV_Z = SALA_Z - 1.5;       // perto da parede AB (fundo)
+    const TV_Z = SALA_Z - 1.5;
+    const TV_H = 1.15;               // altura do centro da TV
 
-    const stand = new THREE.Mesh(
-      new THREE.BoxGeometry(0.9, 0.55, 0.4),
-      new THREE.MeshLambertMaterial({ color: 0x2a1e0a })
-    );
-    stand.position.set(TV_X + 0.2, 0.275, TV_Z);
-    stand.rotation.y = Math.PI / 2;
-    group.add(stand);
+    // Painel (caixa fina)
+    const panelMat = new THREE.MeshLambertMaterial({ color: 0x0A0A0A });
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.60, 0.045), panelMat);
+    panel.position.set(TV_X + 0.023, TV_H, TV_Z);
+    panel.rotation.y = Math.PI / 2;
+    group.add(panel);
 
-    const tvBody = new THREE.Mesh(
-      new THREE.BoxGeometry(0.78, 0.60, 0.55),
-      new THREE.MeshLambertMaterial({ color: 0x0e0c08 })
-    );
-    tvBody.position.set(TV_X + 0.275, 0.85, TV_Z);
-    tvBody.rotation.y = Math.PI / 2;
-    tvBody.castShadow = true;
-    group.add(tvBody);
+    // Borda interna escura (moldura da tela)
+    const frameMat = new THREE.MeshLambertMaterial({ color: 0x050505 });
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.54, 0.005), frameMat);
+    frame.position.set(TV_X + 0.047, TV_H, TV_Z);
+    frame.rotation.y = Math.PI / 2;
+    group.add(frame);
 
     // Tela — estática animada via canvas
     const tvCanvas = document.createElement('canvas');
@@ -184,8 +184,8 @@ export function buildApartment() {
     const tvCtx = tvCanvas.getContext('2d');
     const tvTex = new THREE.CanvasTexture(tvCanvas);
     const screenMat = new THREE.MeshBasicMaterial({ map: tvTex });
-    const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.60, 0.46), screenMat);
-    screen.position.set(TV_X + 0.56, 0.85, TV_Z);
+    const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.90, 0.52), screenMat);
+    screen.position.set(TV_X + 0.050, TV_H, TV_Z);
     screen.rotation.y = Math.PI / 2;
     screen.userData = { type: 'tv', id: 'tv', label: '[E] TV' };
     group.add(screen);
@@ -194,16 +194,23 @@ export function buildApartment() {
     group.userData.tvStaticCtx = tvCtx;
     group.userData.tvStaticTex = tvTex;
 
-    // Luz da TV — branca-fria, projeta para X positivo (interior da sala)
+    // Suporte de parede (haste fina)
+    const mountMat = new THREE.MeshLambertMaterial({ color: 0x181818 });
+    const mount = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.18, 0.14), mountMat);
+    mount.position.set(TV_X + 0.01, TV_H, TV_Z);
+    mount.rotation.y = Math.PI / 2;
+    group.add(mount);
+
+    // Luz da TV — branca-fria, projeta para X positivo
     const tvLight = new THREE.PointLight(0xE8E8FF, 1.2, 5, 2.0);
-    tvLight.position.set(TV_X + 1.0, 0.9, TV_Z);
+    tvLight.position.set(TV_X + 1.0, TV_H, TV_Z);
     group.add(tvLight);
     group.userData.tvLight = tvLight;
   }
 
   // ── SOFÁ AZUL MARINHO ──
   {
-    const sofaM = new THREE.MeshLambertMaterial({ color: 0x1C2340 });
+    const sofaM = new THREE.MeshLambertMaterial({ color: 0x1E1A18 }); // cinza carvão
 
     // Canto superior direito: encosto na parede AD (x=+2.5), braço na parede AB (z=-2.0)
     const SX = SALA_X + 2.05, SZ = SALA_Z - 0.8;
@@ -212,35 +219,35 @@ export function buildApartment() {
     sofaG.position.set(SX, 0, SZ);
     sofaG.rotation.y = -Math.PI / 2;
 
-    // Assento: 2.1 x 0.45 x 0.9, base a 0.35m do chão
+    // Assento: 2.1 x 0.45 x 0.9 — fundo no chão (y=0)
     const seat = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.45, 0.9), sofaM);
-    seat.position.set(0, 0.35 + 0.225, 0);
+    seat.position.set(0, 0.225, 0);
     sofaG.add(seat);
 
     // Encosto: 2.1 x 0.6 x 0.15, atrás do assento, levemente inclinado
     const back = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.6, 0.15), sofaM);
-    back.position.set(0, 0.35 + 0.45 + 0.3, -0.375);
+    back.position.set(0, 0.45 + 0.3, -0.375);
     back.rotation.x = -0.1;
     sofaG.add(back);
 
     // Braço esquerdo: 0.15 x 0.55 x 0.9
     const armL = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.55, 0.9), sofaM);
-    armL.position.set(-1.125, 0.35 + 0.275, 0);
+    armL.position.set(-1.125, 0.275, 0);
     sofaG.add(armL);
 
     // Braço direito
     const armR = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.55, 0.9), sofaM);
-    armR.position.set(1.125, 0.35 + 0.275, 0);
+    armR.position.set(1.125, 0.275, 0);
     sofaG.add(armR);
 
     // Almofadas (esferas achatadas)
     [-0.5, 0.5].forEach(ox => {
       const pillow = new THREE.Mesh(
         new THREE.SphereGeometry(0.22, 10, 8),
-        new THREE.MeshLambertMaterial({ color: 0x2A3560 })
+        new THREE.MeshLambertMaterial({ color: 0x2A2624 })
       );
       pillow.scale.set(1, 0.4, 0.85);
-      pillow.position.set(ox, 0.35 + 0.45 + 0.09, -0.05);
+      pillow.position.set(ox, 0.45 + 0.09, -0.05);
       sofaG.add(pillow);
     });
 
@@ -267,17 +274,31 @@ export function buildApartment() {
     );
     tableLeg.position.set(SALA_X - 1.95, 0.36, SALA_Z + 1.45);
     group.add(tableLeg);
-    // 3 cadeiras — ao lado direito da mesa (interior da sala)
-    [-0.7, 0, 0.7].forEach(dz => {
-      const chair = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.04, 0.38),
-        new THREE.MeshLambertMaterial({ color: 0x1a1208 }));
-      chair.position.set(SALA_X - 1.05, 0.46, SALA_Z + 1.35 + dz * 0.5);
-      group.add(chair);
-      const back = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.38, 0.04),
-        new THREE.MeshLambertMaterial({ color: 0x1a1208 }));
-      back.position.set(SALA_X - 1.05, 0.67, SALA_Z + 1.35 + dz * 0.5 - 0.18);
-      group.add(back);
-    });
+    // 3 cadeiras iguais — lado direito da mesa, voltadas para ela (-X)
+    const chairMat = new THREE.MeshLambertMaterial({ color: 0x1a1208 });
+    function makeChairAt(wx, wz, ry) {
+      const cg = new THREE.Group();
+      // Assento
+      cg.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.04, 0.40), chairMat),
+        { position: new THREE.Vector3(0, 0.46, 0) }));
+      // Encosto
+      cg.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.36, 0.04), chairMat),
+        { position: new THREE.Vector3(0, 0.67, -0.18) }));
+      // 4 pernas
+      [[-0.17, -0.16], [0.17, -0.16], [-0.17, 0.16], [0.17, 0.16]].forEach(([lx, lz]) => {
+        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.44, 5), chairMat);
+        leg.position.set(lx, 0.22, lz);
+        cg.add(leg);
+      });
+      cg.position.set(wx, 0, wz);
+      cg.rotation.y = ry;
+      group.add(cg);
+    }
+    const CX = SALA_X - 1.0;
+    const FACE = -Math.PI / 2; // voltadas para -X (em direção à mesa)
+    makeChairAt(CX, SALA_Z + 1.05, FACE);
+    makeChairAt(CX, SALA_Z + 1.45, FACE);
+    makeChairAt(CX, SALA_Z + 1.80, FACE);
     colliders.push(new THREE.Box3(
       new THREE.Vector3(SALA_X-2.5, 0, SALA_Z+0.85),
       new THREE.Vector3(SALA_X-1.3, 0.78, SALA_Z+2.0)
