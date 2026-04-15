@@ -277,20 +277,246 @@ export function buildApartment() {
     ));
   }
 
-  // ── GUITARRAS (asset externo PNG) ──
+  // ── GUITARRAS 3D ──
   {
-    new THREE.TextureLoader().load('assets/textures/sala/guitarra.png', tex => {
-      const mat = new THREE.MeshBasicMaterial({
-        map: tex,
-        transparent: true,
-        alphaTest: 0.1,
-        side: THREE.FrontSide,
-      });
-      const plane = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.4), mat);
-      plane.position.set(SALA_X + SALA_W/2 - 0.01, 1.4, SALA_Z);
-      plane.rotation.y = -Math.PI / 2;
-      group.add(plane);
-    });
+    // Materiais compartilhados
+    const pegMat   = new THREE.MeshLambertMaterial({ color: 0xB8A060 });
+    const stringMat = new THREE.MeshBasicMaterial({ color: 0xD0C898 });
+    const metalMat  = new THREE.MeshLambertMaterial({ color: 0xA0A0A0 });
+
+    // ── Violão acústico ──
+    function makeAcoustic() {
+      const g = new THREE.Group();
+      const bodyMat  = new THREE.MeshLambertMaterial({ color: 0x7B3A10 }); // mogno escuro
+      const topMat   = new THREE.MeshLambertMaterial({ color: 0xC8943C }); // tampo claro
+      const neckMat  = new THREE.MeshLambertMaterial({ color: 0x3A1A06 }); // escuro
+      const holeMat  = new THREE.MeshBasicMaterial({ color: 0x050202 });
+
+      // Tampo frontal (CylinderGeometry rotacionado → disco no plano XY)
+      // Lower bout
+      const lbTop = new THREE.Mesh(new THREE.CylinderGeometry(0.185, 0.185, 0.012, 8), topMat);
+      lbTop.rotation.x = Math.PI / 2;
+      lbTop.position.set(0, -0.08, 0.038);
+      g.add(lbTop);
+
+      // Upper bout
+      const ubTop = new THREE.Mesh(new THREE.CylinderGeometry(0.128, 0.128, 0.012, 8), topMat);
+      ubTop.rotation.x = Math.PI / 2;
+      ubTop.position.set(0, 0.24, 0.038);
+      g.add(ubTop);
+
+      // Corpo traseiro lower bout
+      const lb = new THREE.Mesh(new THREE.CylinderGeometry(0.185, 0.185, 0.075, 8), bodyMat);
+      lb.rotation.x = Math.PI / 2;
+      lb.position.set(0, -0.08, 0);
+      g.add(lb);
+
+      // Corpo traseiro upper bout
+      const ub = new THREE.Mesh(new THREE.CylinderGeometry(0.128, 0.128, 0.075, 8), bodyMat);
+      ub.rotation.x = Math.PI / 2;
+      ub.position.set(0, 0.24, 0);
+      g.add(ub);
+
+      // Cintura (preenchimento entre os bouts)
+      const waist = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.20, 0.075), bodyMat);
+      waist.position.set(0, 0.08, 0);
+      g.add(waist);
+      const waistTop = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.20, 0.012), topMat);
+      waistTop.position.set(0, 0.08, 0.038);
+      g.add(waistTop);
+
+      // Boca (sound hole)
+      const hole = new THREE.Mesh(new THREE.CircleGeometry(0.058, 8), holeMat);
+      hole.position.set(0, 0.10, 0.046);
+      g.add(hole);
+
+      // Pestana/aro lateral
+      const rim = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.58, 0.075), bodyMat);
+      rim.position.set(-0.19, 0.08, 0);
+      g.add(rim);
+      const rim2 = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.58, 0.075), bodyMat);
+      rim2.position.set(0.19, 0.08, 0);
+      g.add(rim2);
+
+      // Escala/braço
+      const neck = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.50, 0.030), neckMat);
+      neck.position.set(0, 0.62, 0.010);
+      g.add(neck);
+
+      // Fretboard (frente do braço)
+      const fb = new THREE.Mesh(new THREE.BoxGeometry(0.052, 0.48, 0.010), neckMat);
+      fb.position.set(0, 0.62, 0.028);
+      g.add(fb);
+
+      // Cabeça
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.078, 0.115, 0.025), neckMat);
+      head.position.set(0, 0.91, 0.008);
+      g.add(head);
+
+      // Tarraxas (3 por lado)
+      for (let i = 0; i < 3; i++) {
+        const pl = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.028, 4), pegMat);
+        pl.rotation.z = Math.PI / 2;
+        pl.position.set(-0.054, 0.862 + i * 0.036, 0.008);
+        g.add(pl);
+        const pr = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.028, 4), pegMat);
+        pr.rotation.z = Math.PI / 2;
+        pr.position.set(0.054, 0.862 + i * 0.036, 0.008);
+        g.add(pr);
+      }
+
+      // Cavalete
+      const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.090, 0.022, 0.018), neckMat);
+      bridge.position.set(0, -0.18, 0.043);
+      g.add(bridge);
+
+      // Cordas (6)
+      for (let i = 0; i < 6; i++) {
+        const sx = (i - 2.5) * 0.010;
+        const s = new THREE.Mesh(new THREE.BoxGeometry(0.0025, 0.92, 0.0015), stringMat);
+        s.position.set(sx, 0.33, 0.046);
+        g.add(s);
+      }
+
+      // Gancho de parede
+      const hook = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.055, 4), metalMat);
+      hook.rotation.z = Math.PI / 2;
+      hook.position.set(0, 0.97, -0.02);
+      g.add(hook);
+
+      return g;
+    }
+
+    // ── Guitarra elétrica (Stratocaster) ──
+    function makeElectric() {
+      const g = new THREE.Group();
+      const bodyMat     = new THREE.MeshLambertMaterial({ color: 0xB5251A }); // vermelho sunburst
+      const bodyEdgeMat = new THREE.MeshLambertMaterial({ color: 0x7A1510 }); // borda escura
+      const pickguardMat= new THREE.MeshLambertMaterial({ color: 0xDDDDD5 }); // branco pérola
+      const neckMat     = new THREE.MeshLambertMaterial({ color: 0xD4A84B }); // maple
+      const fbMat       = new THREE.MeshLambertMaterial({ color: 0x1C0C04 }); // rosewood
+      const pickupMat   = new THREE.MeshLambertMaterial({ color: 0x111111 });
+
+      // Corpo principal
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.340, 0.420, 0.058), bodyMat);
+      body.position.set(0, -0.06, 0);
+      g.add(body);
+
+      // Borda escura (outline)
+      const bodyEdge = new THREE.Mesh(new THREE.BoxGeometry(0.345, 0.425, 0.055), bodyEdgeMat);
+      bodyEdge.position.set(0, -0.06, -0.002);
+      g.add(bodyEdge);
+
+      // Chifre superior (Strat)
+      const hornU = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.190, 0.058), bodyMat);
+      hornU.position.set(-0.195, 0.225, 0);
+      g.add(hornU);
+      // Ponta arredondada do chifre superior
+      const hornUTip = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 0.058, 6), bodyMat);
+      hornUTip.rotation.x = Math.PI / 2;
+      hornUTip.position.set(-0.214, 0.308, 0);
+      g.add(hornUTip);
+
+      // Chifre inferior (menor)
+      const hornL = new THREE.Mesh(new THREE.BoxGeometry(0.070, 0.115, 0.058), bodyMat);
+      hornL.position.set(-0.180, -0.238, 0);
+      g.add(hornL);
+      const hornLTip = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.058, 6), bodyMat);
+      hornLTip.rotation.x = Math.PI / 2;
+      hornLTip.position.set(-0.196, -0.290, 0);
+      g.add(hornLTip);
+
+      // Pickguard
+      const pg = new THREE.Mesh(new THREE.PlaneGeometry(0.190, 0.360), pickguardMat);
+      pg.position.set(-0.025, -0.01, 0.030);
+      g.add(pg);
+
+      // 3 captadores
+      for (let i = 0; i < 3; i++) {
+        const pu = new THREE.Mesh(new THREE.BoxGeometry(0.115, 0.038, 0.018), pickupMat);
+        pu.position.set(-0.025, 0.115 - i * 0.135, 0.040);
+        g.add(pu);
+        // Ímãs (6 pontinhos)
+        for (let p = 0; p < 6; p++) {
+          const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.010, 4), metalMat);
+          pin.rotation.x = Math.PI / 2;
+          pin.position.set(-0.025 + (p - 2.5) * 0.016, 0.115 - i * 0.135, 0.050);
+          g.add(pin);
+        }
+      }
+
+      // Braço (neck)
+      const neck = new THREE.Mesh(new THREE.BoxGeometry(0.052, 0.510, 0.030), neckMat);
+      neck.position.set(0, 0.485, 0.010);
+      g.add(neck);
+
+      // Fretboard
+      const fb = new THREE.Mesh(new THREE.BoxGeometry(0.049, 0.490, 0.010), fbMat);
+      fb.position.set(0, 0.485, 0.028);
+      g.add(fb);
+
+      // Trastes (marcações aproximadas)
+      for (let i = 0; i < 8; i++) {
+        const fret = new THREE.Mesh(new THREE.BoxGeometry(0.049, 0.003, 0.003), metalMat);
+        fret.position.set(0, 0.245 + i * 0.060, 0.033);
+        g.add(fret);
+      }
+
+      // Cabeça Strat (assimétrica)
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.060, 0.165, 0.022), neckMat);
+      head.position.set(-0.008, 0.810, 0.008);
+      g.add(head);
+
+      // Tarraxas (6 em linha)
+      for (let i = 0; i < 6; i++) {
+        const peg = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.026, 4), pegMat);
+        peg.rotation.z = Math.PI / 2;
+        peg.position.set(-0.052, 0.738 + i * 0.024, 0.008);
+        g.add(peg);
+      }
+
+      // Ponte (tremolo)
+      const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.042, 0.022), metalMat);
+      bridge.position.set(0, -0.175, 0.040);
+      g.add(bridge);
+
+      // Sela de saída (output jack) - detalhe lateral
+      const jack = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.020, 4), metalMat);
+      jack.position.set(0.175, -0.12, 0);
+      g.add(jack);
+
+      // Cordas (6)
+      for (let i = 0; i < 6; i++) {
+        const sx = (i - 2.5) * 0.009;
+        const s = new THREE.Mesh(new THREE.BoxGeometry(0.002, 0.870, 0.0015), stringMat);
+        s.position.set(sx, 0.325, 0.042);
+        g.add(s);
+      }
+
+      // Gancho de parede
+      const hook = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.055, 4), metalMat);
+      hook.rotation.z = Math.PI / 2;
+      hook.position.set(0, 0.985, -0.018);
+      g.add(hook);
+
+      return g;
+    }
+
+    const WALL_X = SALA_X + SALA_W / 2 - 0.07;
+
+    // Violão (esquerda, levemente inclinado)
+    const acoustic = makeAcoustic();
+    acoustic.position.set(WALL_X, 1.62, SALA_Z - 0.35);
+    acoustic.rotation.y = Math.PI / 2;
+    acoustic.rotation.z = 0.06;
+    group.add(acoustic);
+
+    // Elétrica (direita, inclinação oposta)
+    const electric = makeElectric();
+    electric.position.set(WALL_X, 1.62, SALA_Z + 0.35);
+    electric.rotation.y = Math.PI / 2;
+    electric.rotation.z = -0.06;
+    group.add(electric);
   }
 
   // ── SACADA: VIDRO + CORTINA + VARÃO + LUZES DA CIDADE ──
