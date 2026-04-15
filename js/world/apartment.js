@@ -160,31 +160,39 @@ export function buildApartment() {
 
   // ── TV PLANA (parede BC — esquerda, perto do fundo) ──
   {
-    const TV_X = SALA_X - SALA_W/2;  // x = -2.5 (parede BC)
-    const TV_Z = SALA_Z - 1.5;
-    const TV_H = 1.15;               // altura do centro da TV
+    const TV_X = SALA_X - SALA_W/2;   // x = -2.5 (parede BC)
+    const TV_Z = SALA_Z - 0.8;        // recentrada p/ TV mais larga não clipar fundo
+    const TV_H = 1.35;                // centro da TV
+    const TV_W = 2.0, TV_HH = 1.20;  // tela dobrada (mesma espessura)
 
-    // Painel (caixa fina)
+    // ── Rack ──
+    const rackMat = new THREE.MeshLambertMaterial({ color: 0x2a1e0a });
+    const rack = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.45, 0.38), rackMat);
+    rack.position.set(TV_X + 0.19, 0.225, TV_Z);
+    rack.rotation.y = Math.PI / 2;
+    group.add(rack);
+
+    // ── Painel (espessura mantida, tela maior) ──
     const panelMat = new THREE.MeshLambertMaterial({ color: 0x0A0A0A });
-    const panel = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.60, 0.045), panelMat);
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(TV_W, TV_HH, 0.045), panelMat);
     panel.position.set(TV_X + 0.023, TV_H, TV_Z);
     panel.rotation.y = Math.PI / 2;
     group.add(panel);
 
-    // Borda interna escura (moldura da tela)
+    // Moldura
     const frameMat = new THREE.MeshLambertMaterial({ color: 0x050505 });
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.54, 0.005), frameMat);
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(TV_W - 0.16, TV_HH - 0.12, 0.005), frameMat);
     frame.position.set(TV_X + 0.047, TV_H, TV_Z);
     frame.rotation.y = Math.PI / 2;
     group.add(frame);
 
-    // Tela — estática animada via canvas
+    // Tela — canvas animado
     const tvCanvas = document.createElement('canvas');
     tvCanvas.width = 64; tvCanvas.height = 48;
     const tvCtx = tvCanvas.getContext('2d');
     const tvTex = new THREE.CanvasTexture(tvCanvas);
     const screenMat = new THREE.MeshBasicMaterial({ map: tvTex });
-    const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.90, 0.52), screenMat);
+    const screen = new THREE.Mesh(new THREE.PlaneGeometry(TV_W - 0.20, TV_HH - 0.16), screenMat);
     screen.position.set(TV_X + 0.050, TV_H, TV_Z);
     screen.rotation.y = Math.PI / 2;
     screen.userData = { type: 'tv', id: 'tv', label: '[E] TV' };
@@ -194,14 +202,33 @@ export function buildApartment() {
     group.userData.tvStaticCtx = tvCtx;
     group.userData.tvStaticTex = tvTex;
 
-    // Suporte de parede (haste fina)
-    const mountMat = new THREE.MeshLambertMaterial({ color: 0x181818 });
-    const mount = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.18, 0.14), mountMat);
-    mount.position.set(TV_X + 0.01, TV_H, TV_Z);
-    mount.rotation.y = Math.PI / 2;
-    group.add(mount);
+    // ── Dois tripés (um em cada lateral) ──
+    const tripodMat = new THREE.MeshLambertMaterial({ color: 0x1C1C1C });
+    const TV_BOT  = TV_H - TV_HH / 2;  // y da base da TV = 0.75
+    const RACK_TOP = 0.45;
 
-    // Luz da TV — branca-fria, projeta para X positivo
+    function addLeg(x1, y1, z1, x2, y2, z2) {
+      const dx = x2-x1, dy = y2-y1, dz = z2-z1;
+      const len = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      const cyl = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, len, 5), tripodMat);
+      cyl.position.set((x1+x2)/2, (y1+y2)/2, (z1+z2)/2);
+      cyl.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(dx/len, dy/len, dz/len)
+      );
+      group.add(cyl);
+    }
+
+    [-0.88, 0.88].forEach(side => {
+      const tx = TV_X + 0.023;
+      const tz = TV_Z + side;
+      // 3 pernas: uma para frente (interior da sala) e duas em diagonal lateral
+      addLeg(tx, TV_BOT, tz,  tx + 0.32, RACK_TOP, tz);
+      addLeg(tx, TV_BOT, tz,  tx + 0.08, RACK_TOP, tz - 0.20);
+      addLeg(tx, TV_BOT, tz,  tx + 0.08, RACK_TOP, tz + 0.20);
+    });
+
+    // Luz da TV
     const tvLight = new THREE.PointLight(0xE8E8FF, 1.2, 5, 2.0);
     tvLight.position.set(TV_X + 1.0, TV_H, TV_Z);
     group.add(tvLight);
@@ -210,7 +237,7 @@ export function buildApartment() {
 
   // ── SOFÁ AZUL MARINHO ──
   {
-    const sofaM = new THREE.MeshLambertMaterial({ color: 0x1E1A18 }); // cinza carvão
+    const sofaM = new THREE.MeshLambertMaterial({ color: 0xC4A882 }); // bege
 
     // Canto superior direito: encosto na parede AD (x=+2.5), braço na parede AB (z=-2.0)
     const SX = SALA_X + 2.05, SZ = SALA_Z - 0.8;
@@ -244,7 +271,7 @@ export function buildApartment() {
     [-0.5, 0.5].forEach(ox => {
       const pillow = new THREE.Mesh(
         new THREE.SphereGeometry(0.22, 10, 8),
-        new THREE.MeshLambertMaterial({ color: 0x2A2624 })
+        new THREE.MeshLambertMaterial({ color: 0xB09870 })
       );
       pillow.scale.set(1, 0.4, 0.85);
       pillow.position.set(ox, 0.45 + 0.09, -0.05);
