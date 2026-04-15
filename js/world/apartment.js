@@ -186,7 +186,7 @@ export function buildApartment() {
     const screenMat = new THREE.MeshBasicMaterial({ map: tvTex });
     const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.60, 0.46), screenMat);
     screen.position.set(TV_X + 0.56, 0.85, TV_Z);
-    screen.rotation.y = -Math.PI / 2;
+    screen.rotation.y = Math.PI / 2;
     screen.userData = { type: 'tv', id: 'tv', label: '[E] TV' };
     group.add(screen);
     interactables.push(screen);
@@ -210,7 +210,7 @@ export function buildApartment() {
 
     const sofaG = new THREE.Group();
     sofaG.position.set(SX, 0, SZ);
-    sofaG.rotation.y = Math.PI / 2;
+    sofaG.rotation.y = -Math.PI / 2;
 
     // Assento: 2.1 x 0.45 x 0.9, base a 0.35m do chão
     const seat = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.45, 0.9), sofaM);
@@ -621,7 +621,7 @@ export function buildApartment() {
     const noteM = new THREE.MeshBasicMaterial({ color: 0xc8c090 });
     const note  = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 0.08), noteM);
     note.position.set(SALA_X - SALA_W/2 + 0.04, 0.75, SALA_Z - 1.5 + 0.45);
-    note.rotation.y = -Math.PI / 2;
+    note.rotation.y = Math.PI / 2;
     note.userData = { type: 'note', id: 'note_behind_tv', label: '[E] Pegar bilhete' };
     group.add(note);
     interactables.push(note);
