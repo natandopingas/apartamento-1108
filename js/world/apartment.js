@@ -279,11 +279,13 @@ export function buildApartment() {
     function makeChairAt(wx, wz, ry) {
       const cg = new THREE.Group();
       // Assento
-      cg.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.04, 0.40), chairMat),
-        { position: new THREE.Vector3(0, 0.46, 0) }));
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.04, 0.40), chairMat);
+      seat.position.set(0, 0.46, 0);
+      cg.add(seat);
       // Encosto
-      cg.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.36, 0.04), chairMat),
-        { position: new THREE.Vector3(0, 0.67, -0.18) }));
+      const back = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.36, 0.04), chairMat);
+      back.position.set(0, 0.67, -0.18);
+      cg.add(back);
       // 4 pernas
       [[-0.17, -0.16], [0.17, -0.16], [-0.17, 0.16], [0.17, 0.16]].forEach(([lx, lz]) => {
         const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.44, 5), chairMat);
