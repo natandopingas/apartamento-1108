@@ -507,14 +507,14 @@ export function buildApartment() {
     // Violão (esquerda, levemente inclinado)
     const acoustic = makeAcoustic();
     acoustic.position.set(WALL_X, 1.62, SALA_Z - 0.35);
-    acoustic.rotation.y = Math.PI / 2;
+    acoustic.rotation.y = -Math.PI / 2;
     acoustic.rotation.z = 0.06;
     group.add(acoustic);
 
     // Elétrica (direita, inclinação oposta)
     const electric = makeElectric();
     electric.position.set(WALL_X, 1.62, SALA_Z + 0.35);
-    electric.rotation.y = Math.PI / 2;
+    electric.rotation.y = -Math.PI / 2;
     electric.rotation.z = -0.06;
     group.add(electric);
   }
