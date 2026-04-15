@@ -277,27 +277,20 @@ export function buildApartment() {
     ));
   }
 
-  // ── GUITARRAS (parede direita) ──
+  // ── GUITARRAS (asset externo PNG) ──
   {
-    // Acústica
-    const g1M = new THREE.MeshLambertMaterial({ color: 0x6a3e10 });
-    const g1b = new THREE.Mesh(new THREE.SphereGeometry(0.18,8,8), g1M);
-    g1b.position.set(SALA_X + SALA_W/2 - 0.22, 1.4, SALA_Z - 0.4);
-    g1b.scale.set(1, 1.6, 0.4);
-    group.add(g1b);
-    const g1n = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.7, 0.06), new THREE.MeshLambertMaterial({color:0x4a2808}));
-    g1n.position.set(SALA_X + SALA_W/2 - 0.22, 2.0, SALA_Z - 0.4);
-    group.add(g1n);
-
-    // Elétrica vermelha
-    const g2M = new THREE.MeshLambertMaterial({ color: 0x880a0a });
-    const g2b = new THREE.Mesh(new THREE.SphereGeometry(0.17,8,8), g2M);
-    g2b.position.set(SALA_X + SALA_W/2 - 0.22, 1.4, SALA_Z + 0.4);
-    g2b.scale.set(1, 1.5, 0.35);
-    group.add(g2b);
-    const g2n = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.72, 0.05), new THREE.MeshLambertMaterial({color:0x1a1008}));
-    g2n.position.set(SALA_X + SALA_W/2 - 0.22, 2.0, SALA_Z + 0.4);
-    group.add(g2n);
+    new THREE.TextureLoader().load('assets/textures/sala/guitarra.png', tex => {
+      const mat = new THREE.MeshBasicMaterial({
+        map: tex,
+        transparent: true,
+        alphaTest: 0.1,
+        side: THREE.FrontSide,
+      });
+      const plane = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.4), mat);
+      plane.position.set(SALA_X + SALA_W/2 - 0.01, 1.4, SALA_Z);
+      plane.rotation.y = -Math.PI / 2;
+      group.add(plane);
+    });
   }
 
   // ── SACADA: VIDRO + CORTINA + VARÃO + LUZES DA CIDADE ──
